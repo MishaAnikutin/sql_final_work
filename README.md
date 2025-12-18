@@ -84,7 +84,7 @@ erDiagram
 
 Пользователь вводит частотность ряда и его название, в таблице создается новая запись:
 
-```psql
+```sql
 WITH freq AS (
     SELECT id FROM data_frequency WHERE name = *Частотность ряда*
 )
@@ -95,7 +95,7 @@ RETURNING id
 ```
 
 После успешной обработки формируется запрос на вставку данных:
-```psql
+```sql
 INSERT INTO 
     series_values (series_id, date, value) 
 VALUES 
@@ -127,7 +127,7 @@ VALUES
 
 Допустим, пользователь хочет обьеденить ряды с индексами id_1, id_2, id_3, ... Тогда на бэкенде сформируется следующий запрос:
 Тогда аггрегировав данные по дате, у нас для каждого уникального айдишника будет не более 1 значения в каждый момент времени. Можно применить почти любую аггрегационную функцию для получения значения (MIN, MAX, SUM, AVG ...)
-```psql
+```sql
 SELECT 
     date,
     MAX(CASE WHEN series_id = id_1 THEN value END) AS *Название ряда 1*,
@@ -154,7 +154,7 @@ ORDER BY date;
 3. Запрос отправляется в прогнозный сервис, из которого возвращается бинарная сериализация весов моделей (с расширением .pkl или .pth)
 4. После успешной обработки прогнозного сервиса, нужно сохранить метаданные прогнозной модели:
 
-```psql
+```sql
 INSERT INTO 
     forecast_models (name, weight_url, model_type_id)
 VALUES 
@@ -172,7 +172,7 @@ VALUES
 Для каждой из них будет свой обработчик, который принимает на вход `id` ряда а результатом сохраняет обработанный ряд в `features`: 
 
 Например скользящее среднее реализуется через оконную функцию `AVG `и группировку через `ROWS BETWEEN` с указанием границ окна:
-```psql
+```sql
 SELECT 
 	  date,
     AVG(value) OVER (ORDER BY date ROWS BETWEEN {N - 1} PRECEDING AND CURRENT ROW) as sma_{N}
@@ -183,7 +183,7 @@ OFFSET {N - 1}
 ```
 Взятие разностей работает по аналогии:
 
-```psql
+```sql
 SELECT 
 	date,
 	value - LAG(value) OVER (ORDER BY date) as diff_value
@@ -194,7 +194,7 @@ ORDER BY date
 
 Логарифмирование проще:
 
-```psql
+```sql
 SELECT 
 	date,
 	LOG(value) as log_value
