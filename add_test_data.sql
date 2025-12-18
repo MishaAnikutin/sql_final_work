@@ -10,3 +10,12 @@ VALUES
 	('QE'),
 	('YE');
 
+-- Типы моделей
+INSERT INTO
+	model_types (name)
+VALUES
+	('ARIMAX'),
+	('VAR'),
+	('GARCH'),
+	('CatBoost'),
+	('LSTM');
